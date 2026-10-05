@@ -25,7 +25,7 @@ Aim for variety, not volume. One of each kind is worth more than ten of the same
 - **One-time passwords (OTPs): do not collect them.** If an OTP message is the only example of "noise", replace every digit of the code with `X` before it leaves your phone. The app will never store an OTP (RAW 01).
 - **Blank out before sharing:** full account and card numbers (keep the last four digits only if the bank prints them), your name and other people's names, phone numbers, email addresses, UPI handles (`name@bank`), reference or transaction numbers (replace with `REF123456`, keep the length), and any balance you don't want known. Keep the **amount, currency, date, time and merchant name**, because the parser depends on them.
 - **Keep the original wording and layout.** Do not retype or tidy the message. Only replace the sensitive parts.
-- When the redaction tool exists (plan task 14, `tools/redact_alert.py`) run it on every file and then read the result yourself before sharing.
+- Run `python tools/redact_alert.py your-file.txt` on every file. It writes `your-file.redacted.txt` and lists what it changed. It masks OTP codes, long numbers (keeping the last four digits), mobile numbers, UPI handles, emails, and names after "Dear" or a title. It cannot find a name inside free text, so read the result yourself before sharing.
 - Raw (unredacted) alerts stay on your computer in `docs/evidence/raw/`. That folder is ignored by git and must never be committed. Do not commit the redacted files either until you have looked at them, because this repository is public.
 
 ## 3. How to collect
