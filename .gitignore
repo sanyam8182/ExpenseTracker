@@ -3,3 +3,18 @@
 
 # Stale copy, markdown is canonical
 Expense_Tracker_Requirements.docx
+
+# Android build output, local config and signing material
+android/**/build/
+android/.gradle/
+android/.kotlin/
+android/local.properties
+*.keystore
+*.jks
+*.hprof
+.idea/
+*.iml
+
+# Unredacted bank alert samples and unreviewed fixtures must never be committed (SPIKE-03)
+docs/evidence/raw/
+docs/evidence/fixtures/
