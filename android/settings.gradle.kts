@@ -17,6 +17,7 @@ dependencyResolutionManagement {
 rootProject.name = "ExpenseTracker"
 
 include(":app")
+include(":spikes")
 
 // Pocket, the budget character library. Included by path; its licence is undecided, so it is not in the repository yet.
 include(":pocket")
