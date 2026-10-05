@@ -24,7 +24,7 @@ Every page has a dark twin except the adaptive page, which shows dark for the fo
 ## 2. Decisions recorded while designing
 
 - **Look:** deep teal hero (`#0A5C5E`), cool off-white page, DM Sans, restrained; Pocket is the one playful element.
-- **Hero total:** "of ₹X in limits" is the sum of the limits you set; Pocket's pose follows left divided by that sum; no limits means no level. Pending review items are not subtracted and are named ("Not counting ₹Y pending").
+- **Hero total:** "of ₹X in limits" is the sum of the limits you set; Pocket's pose follows left divided by that sum (Empty at exactly ₹0, Over budget below it); no limits means the Idle pose and the label "Spent this month". Pending review items are not subtracted and are named ("Not counting ₹Y pending").
 - **Pocket placement:** Overview hero, welcome, empty states, and the plain counted capture sheet only. Never on errors, warnings, over-budget sheets, Review or sharing. Optional "Show Pocket" setting, on by default.
 - **Sharing:** no Accept or Decline. The other person's app joins automatically and shows a one-time notice (what they see, what stays private, Google-editor limit, Leave). The owner sees "Shared, not joined yet" and one action, "Remove access". Accepted risk recorded in MEM 01.
 - **Status language:** every status has an icon and words; amber is for "needs attention" (pending, 80%), red only for over budget and failure.
@@ -33,14 +33,14 @@ Every page has a dark twin except the adaptive page, which shows dark for the fo
 ## 3. Open items
 
 **Assumptions to confirm**
-- "Payday" pose (Pocket kit) is mapped to "new month starts"; income is not in the requirements.
+- Resolved: the concept's "Payday" pose is "Budget ready", played once after saving a new positive budget with nothing spent; no payday or monthly refill is assumed.
 - Window sizes in tokens section 7 are estimates; measure on both pilot phones. Z Flip 5 unfolded is a normal tall phone (compact width).
 - App name is not decided; mockups use "Expense Tracker".
 - Capture health shows app names, not package names (package discovery is SPIKE-03).
 
 **Production dependencies**
 - Real icon set (mockups use placeholder glyphs); DM Sans with ₹ and tabular numerals verified on both phones.
-- Pocket artwork: transparent backgrounds, vector or layered files for animation, confirmed rights.
+- Pocket artwork: vector kit exists in `assets/pocket/` (not in the public repo); still needs device validation, the final Figma component family, and a licence decision (undecided).
 - Google sign-in button follows Google's branding rules.
 
 **Still not designed**

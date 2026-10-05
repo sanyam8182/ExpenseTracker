@@ -33,7 +33,7 @@ Rotation, fold, unfold and process recreation must keep: the selected tab, scrol
 
 - Shows only: label "Left to spend", the amount (`amount-hero`), "of ₹15,600 in limits", Pocket (about 90 dp), and one button "Add expense" (white pill on the hero colour, teal text). No navigation, lists, sheets or settings.
 - After an expense is saved on the cover screen: "Saved. Counted in Fashion" (14 sp), "₹1,299 at Myntra" (28 sp), "Left in Fashion" and `₹2,701` (`amount-hero`). Needs-review items show "Saved. Doesn't count yet" and the amount only; details wait for the main screen.
-- Over budget uses the same "Over budget by" label as the Overview.
+- Over budget uses the same "Over budget by" label as the Overview, and Pocket follows the same mapping (Empty at ₹0, Idle with no limits).
 - Cover content is read-only except for the one add action; anything else says "Open your phone to continue" (copy proposed, not designed).
 - The main screen layouts are used once the phone is opened. State continues across fold and unfold (a half-typed amount is kept).
 

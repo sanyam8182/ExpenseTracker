@@ -30,7 +30,7 @@ Commit to the local database (record, totals change event and outbox in one tran
 Skeleton: a hero-shaped block (24 dp radius, `surfaceVariant`) with three bars, a pill-shaped block, the "Needs a look" title and two skeleton rows. Sync chip reads "Syncing". No spinner, no Pocket.
 
 ### First month, nothing yet
-Top bar and chip, then Pocket (Full, about 150 dp), title "No expenses yet" (20/600), line "Bank alerts appear here by themselves, or add one.", card "Set limits for October" with "Optional. See what's left to spend." and a chevron, FAB "Add expense".
+Top bar and chip, then Pocket (Full if limits are set, Idle if none are, about 150 dp), title "No expenses yet" (20/600), line "Bank alerts appear here by themselves, or add one.", card "Set limits for October" with "Optional. See what's left to spend." and a chevron, FAB "Add expense".
 
 ### Sync failed
 Chip "⚠ Failed". Error banner with an alert-circle icon: "Couldn't sync" / "Your data is saved on this phone. Shared totals may be out of date." and a text button "Try again" (48 dp). Shared hero stays visible with "May be out of date. Last synced 22 min ago." Retry uses bounded backoff for transient failures and an explicit re-authorisation prompt when authorisation expired (data untouched).
@@ -39,7 +39,7 @@ Chip "⚠ Failed". Error banner with an alert-circle icon: "Couldn't sync" / "Yo
 Chip "🔒 Access revoked". Warning banner "Sharing with Rahul ended" / "Your personal budget and history are unchanged. Shared data saved on this phone is cleared the next time you're online." The personal hero remains; the Personal | Shared switch is gone. See `03`.
 
 ### No limits
-Hero label "Spent this month", amount = total net spent, "26 days to go"; no Pocket. Card "No limits set" / "Set a limit for a category to see how much is left. Pocket appears once there is something to measure." and an outlined button "Set limits". Per BUD 02: no "left" value, no percentage and no warning for no-limit categories.
+Hero label "Spent this month", amount = total net spent, "26 days to go", Pocket in the Idle pose. Card "No limits set" / "Set a limit for a category to see how much is left. Pocket appears once there is something to measure." and an outlined button "Set limits". Per BUD 02: no "left" value, no percentage and no warning for no-limit categories. Pocket receives no limit and shows Idle; once a first budget is saved with a positive limit and nothing spent, he plays Budget ready once.
 
 ### Offline
 A quiet banner appears under the top bar; no blocking UI. Copy proposed, not in the mockups: "You're offline. Everything saved here still works." Sign-in needs a connection; everything else is local.

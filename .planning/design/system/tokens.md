@@ -101,26 +101,29 @@ All are at least 3.2:1 on white. In dark theme use the same hex at 85% lightness
 | `inverse-primary` | `#8FE0DE` | `#0C7A7C` | Snackbar action (Undo) |
 | `scrim` | black-teal at 50% | black at 60% | Behind dialogs and sheets |
 
-### 1.5 Pocket, the budget character (concept approved 5 October 2026)
+### 1.5 Pocket, the budget character (concept approved 5 October 2026; aligned to the vector kit)
 
-Pocket is a golden money pouch with a face, arms and legs. Concept art lives in the Figma file "Pocket / Character kit". The artwork is raster, so this section fixes how he is used, not how he is drawn.
+Pocket is a golden money pouch with a face, arms and legs. Production artwork is the vector kit in `assets/pocket/` (nine transparent SVG poses, a rig file, and a native Compose library `com.expensetracker.pocket`; see its README). The Figma file "Pocket / Character kit" holds the approved concepts. The kit has not been run on a device or in a real screen yet. Rights and licence for the artwork are undecided, so the kit is not in the public repository.
 
-| Budget left | Pose | Where the number says |
+| Remaining of the limit | Pose | Hero label |
 | --- | --- | --- |
-| More than 60% | Full: proud, hands on hips | "Left to spend" |
-| 30% to 60% | Halfway: wink, thumbs up | "Left to spend" |
-| Under 30% | Nearly empty: floppy, one last coin | "Left to spend" |
-| 0 or less | Over budget: empty lining, long receipt, sheepish shrug | "Over budget by" |
+| More than 60% | Full | "Left to spend" |
+| 30% to 60%, inclusive | Halfway | "Left to spend" |
+| More than 0% and under 30% | Nearly empty (kit name: Low) | "Left to spend" |
+| Exactly ₹0 | Empty: open hand, no coin | "Left to spend" with ₹0 |
+| Below ₹0 | Over budget: empty lining, long receipt, sheepish shrug | "Over budget by" |
+| No configured limit | Idle: relaxed pose (kit name: No limit) | "Spent this month" |
 
-- Extra poses: **Spending** (coin leaves, a little pffft, settles to the new size), **Payday** (proposed for "new month starts"; income is not in the requirements), **Idle** (blink, foot tap, sideways glance).
-- Hero total (decision 5 October 2026): "of ₹X in limits" is the sum of the category limits you set. Left to spend is that sum minus counted spending in those categories. Pocket's pose uses left divided by that sum. With no limits set there is no total and no Pocket level. Pending review items are not subtracted; the hero says "Not counting ₹Y pending".
-- Pocket never carries information alone: the amount and status words always sit beside him.
-- He never scolds. Over budget uses the shrug, not an alarm. The status colour and words stay on the category rows.
-- Placed bottom-right on the hero card, about 100 to 160dp wide, with a soft drop shadow. The amount stays the largest element.
-- With Android "remove animations" on, every pose is a still image and transitions are instant.
+- The percentage boundaries are cosmetic and separate from the configurable spending alerts (FBK 02). Amounts stay exact integer paise; only the visual percentage is clamped.
+- A configured limit of ₹0 is a limit: zero spent is Empty, any positive spend is Over budget, and no percentage is calculated. Refund credits can restore the pose without a celebration.
+- **Hero total (decision 5 October 2026):** "of ₹X in limits" is the sum of the category limits you set. Left to spend is that sum minus counted spending in those categories. Pocket receives that sum and that spending as one limit and one confirmed net spent. If no category has a limit, he receives "no limit" and shows Idle. Pending review items are not subtracted; the hero says "Not counting ₹Y pending". Never invent a finite total for unconfigured categories.
+- **Events.** Spending: played once after a local save commits (about 500 ms squish, the coin moves independently). Budget ready: played once, only after the user saves a new budget with a positive limit and nothing spent (about 500 ms bounce); never inferred from opening a screen, changing month, a refund or income. There is no payday or monthly refill: a new month with no configured limit stays "No limit" (BUD 05). The concept's "Payday" artwork is called "Budget ready".
+- **Motion.** Blink after about four seconds, subtle breathing, slight cord sway. Different poses cross-blend over about 160 ms (the silhouettes are not shape-matched). With Android "remove animations" on, or reduced motion, every pose is still. Motion pauses while off screen.
+- **Look.** Gold cords by default on the teal hero (the original green cords remain available), optional separate shadow (off by default), placed bottom-right on the hero card at about 100 to 160dp wide. The amount stays the largest element.
+- Pocket never carries information alone: the amount and status words always sit beside him. He is decorative for TalkBack unless a separate description is needed.
 - Use only on the Overview hero, the welcome screen, empty states, and the capture feedback sheet when the purchase counted and no threshold was crossed. Never on errors, warnings, over-budget sheets, Review or sharing screens: his pose follows the whole month, so he does not react to one category.
 - Optional: Settings has a "Show Pocket" switch (on by default) that turns him off everywhere; layouts then close the gap.
-- Open for production: transparent backgrounds, vector or layered artwork for animation, confirmed rights to the artwork.
+- Open for production: device frame timing and density checks on both pilot phones, integration into the real Overview, the final Figma component family, and the licence decision.
 
 ## 2. Typography
 

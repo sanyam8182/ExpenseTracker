@@ -167,17 +167,38 @@ Say "doesn't count yet" for review items, never "error". Never write "successful
 
 ## 8. Pocket (budget character)
 
-Concept art (raster) is in the Figma file "Pocket / Character kit". Production artwork is still to be supplied: transparent backgrounds, vector or layered assets for animation, and confirmed rights. Until then use placeholder poses behind an interface `PocketPose` so the asset can change.
+Production artwork and code: the vector kit in `assets/pocket/` (nine transparent SVG poses, `source/faithful-rig.json`, and the Compose library `com.expensetracker.pocket`; its README covers building and the API). It has not been run on a device or in a real screen yet, and its licence is undecided, so it is not in the public repository. The Figma file "Pocket / Character kit" holds the approved concepts.
 
-| Budget left (of the sum of limits) | Pose |
+Integration: include the `:pocket` module and use the composable. Pass the selected budget's limit and confirmed net spent in integer paise; pending review never enters this API.
+
+```kotlin
+Pocket(
+    budget = PocketBudget(limitPaise = limitsTotalPaise /* null = no limit */, confirmedNetSpentPaise = spentInLimitedPaise),
+    modifier = Modifier.size(100.dp),
+    event = pocketEvent,                 // fresh PocketEvent(id, Spending | BudgetReady) after a local commit
+    cords = PocketCords.ContrastGold,    // default on the teal hero
+    reducedMotion = appSettings.reduceMotion,
+    isVisible = overviewIsVisible,       // false for retained hidden tabs
+)
+```
+
+| Remaining of the limit | Pose |
 | --- | --- |
 | More than 60% | Full |
-| 30% to 60% | Halfway |
-| Under 30% | Nearly empty |
-| 0 or less | Over budget |
-| No limits set | No Pocket level (hero shows "Spent this month") |
+| 30% to 60%, inclusive | Halfway |
+| More than 0% and under 30% | Nearly empty |
+| Exactly ₹0 | Empty (open hand, no coin) |
+| Below ₹0 | Over budget |
+| No configured limit | Idle |
 
-Extra poses: Spending (an expense was saved), Payday (proposed for "new month starts"), Idle (empty states). Pocket never carries information alone and never appears on errors, warnings, over-budget sheets, Review or sharing screens. A "Show Pocket" setting (default on) removes him everywhere. Pocket is bottom-right on the hero, about 100 to 160 dp wide, with a soft shadow.
+Rules:
+- The boundaries are cosmetic and separate from the spending alerts. A configured limit of ₹0 is a limit (zero spent is Empty, positive spend is Over budget, no percentage). Refund credits can restore the pose without a celebration.
+- For the hero, the limit is the sum of the category limits and the spent figure is the spending in those categories. With no limits configured pass `null` (Idle). Never invent a finite total for unconfigured categories.
+- Events: emit a fresh, increasing `PocketEvent` after a local commit. `Spending` plays once after a saved expense. `BudgetReady` is accepted only for a positive limit with nothing spent: emit it explicitly after saving a new budget, never from opening a screen, changing month, a refund or income. There is no payday or monthly refill; an unconfigured new month is "No limit". The initial or restored event ID does not replay.
+- Keep the composable mounted across updates (paths are parsed once). It is decorative by default: the parent exposes the numbers and status. Pass `accessibilityDescription` only when a separate description is needed, to avoid duplicate announcements.
+- Reduced motion or Android animators disabled removes motion. Pause when off screen.
+- Pocket never carries information alone and never appears on errors, warnings, over-budget sheets, Review or sharing screens. A "Show Pocket" setting (default on) removes him everywhere. Bottom-right on the hero, about 100 to 160 dp wide.
+- Open: device frame timing and density checks on both phones, integration into the real Overview, final Figma component family, licence decision.
 
 ## 9. Offline, privacy and data rules every screen must respect
 

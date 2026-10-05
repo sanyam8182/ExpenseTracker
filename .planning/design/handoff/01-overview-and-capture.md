@@ -12,12 +12,12 @@ Requirements: UI 01, BUD 02, BUD 05, CAT 02, FBK 01, FBK 02, FBK 03, CAP 04, AC 
 1. **Top bar** (64 dp): title "Overview" (headline), month selector pill "October ▾" next to it, sync chip right, overflow menu (Settings and recovery). Past months are viewable; their limits are locked.
 2. **Budget switch** (only for an active invitee): segmented control "Personal" | "Shared with Rahul". Selected segment = tint + outline + check. Hidden for solo users and owners (an owner has one budget: personal if solo, shared once converted).
 3. **Hero card** (24 dp radius, `hero` fill, 20 dp padding, minimum height 196 dp, grows with content):
-   - Label "Left to spend" (14 sp, `onHeroSecondary`). When left is 0 or less the label is "Over budget by" and the amount shows the positive overshoot.
+   - Label "Left to spend" (14 sp, `onHeroSecondary`). Below 0 the label is "Over budget by" and the amount shows the positive overshoot. At exactly ₹0 it stays "Left to spend" with `₹0` and Pocket is Empty.
    - Amount (`amount-hero`, `onHero`), e.g. `₹6,520`.
    - Two short lines: "of ₹15,600 in limits" and "26 days to go".
    - If known-amount review items exist: two short lines "Not counting" / "₹2,340 pending" (CAT 02: the figure is not complete while items are pending).
    - Pocket bottom-right, 100 to 160 dp wide, drop shadow. If text would collide with Pocket (large font), shrink Pocket to 72 dp, then hide him; never truncate or hide text.
-   - No limits set: label "Spent this month", amount = total net spent, line "26 days to go", no Pocket.
+   - No limits set: label "Spent this month", amount = total net spent, line "26 days to go", Pocket in his relaxed Idle pose.
 4. **Pending-review row** (24 dp radius, `surfaceVariant`, amber inbox icon): "Pending review ₹2,340 (3 items)" (title-small), "Balances are incomplete" (14 sp), chevron. Opens Review. Shown only if known-amount pending count is above 0.
 5. **"Needs a look"** (title-small): one white list card, rows separated by hairlines.
    - Row: category name (16/600), right-aligned "₹4,400 of ₹4,000" (14 secondary), status line with icon and words, thin progress bar (6 dp, track `outlineVariant`, fill = status colour; over budget = full bar).
@@ -33,7 +33,7 @@ Requirements: UI 01, BUD 02, BUD 05, CAT 02, FBK 01, FBK 02, FBK 03, CAP 04, AC 
 - `limitsTotal` = sum of the limits of categories that have a limit configured for the viewed month (zero counts as 0).
 - `spentInLimited` = net spent (counted purchases minus linked refunds, excluding soft-deleted) in those categories.
 - `left = limitsTotal − spentInLimited`. Spending in no-limit categories is not in this figure.
-- Pocket pose uses `left / limitsTotal`. If `limitsTotal` is 0, show no level.
+- Pocket receives `PocketBudget(limitPaise = limitsTotal, confirmedNetSpentPaise = spentInLimited)`; with no configured limit pass `null` (Idle). A configured total of ₹0 is a limit: zero spent is Empty, positive spend is Over budget, no percentage. Poses and boundaries: README section 8.
 - Pending review items are never subtracted (CAT 02, D-05). Do not label the result "complete" while unresolved financial items exist.
 - "Days to go" = calendar days remaining after today in the month ("Last day" on the last day). Past months: omit the line.
 
@@ -41,12 +41,12 @@ Requirements: UI 01, BUD 02, BUD 05, CAT 02, FBK 01, FBK 02, FBK 03, CAP 04, AC 
 Month, budget (personal or shared), limits per category, net spent per category (paise), thresholds, pending known-amount total and count, unknown-amount and foreign-currency counts, sync state, show-Pocket preference.
 
 ### States
-Default; loading (skeleton: hero block, row block, two list rows, no Pocket); first month with no expenses (Pocket Full, "No expenses yet" / "Bank alerts appear here by themselves, or add one.", row "Set limits for October — Optional. See what's left to spend."); no limits set (hero "Spent this month", card "No limits set / Set a limit for a category to see how much is left. Pocket appears once there is something to measure." with "Set limits"); sync failed (see `08`); access revoked (see `08`); stale and pending (chip plus "May be out of date. Last synced 22 min ago." on shared figures); offline (quiet banner, local data fully usable).
+Default; loading (skeleton: hero block, row block, two list rows, no Pocket); first month with no expenses (Pocket Full if limits are set, Idle if not; "No expenses yet" / "Bank alerts appear here by themselves, or add one.", row "Set limits for October — Optional. See what's left to spend."); no limits set (hero "Spent this month", card "No limits set / Set a limit for a category to see how much is left. Pocket appears once there is something to measure." with "Set limits"); sync failed (see `08`); access revoked (see `08`); stale and pending (chip plus "May be out of date. Last synced 22 min ago." on shared figures); offline (quiet banner, local data fully usable).
 
 ### Behaviour
 - Tap hero: no action. Tap pending row: Review. Tap a "Needs a look" row: Budget limits for that category (design: open the Budget tab scrolled to it). Tap on-track row: full category list (**not yet designed**, see Open items).
 - Changing month reloads figures; past-month limits are read-only.
-- After an expense is saved, the hero amount and Pocket level animate (`meter`, 400 ms); Pocket may play Spending once.
+- After an expense is saved, the hero amount and Pocket level animate (`meter`, 400 ms) and Pocket plays Spending once. After the user saves a new budget with a positive limit and nothing spent, Pocket plays Budget ready once.
 - The Review badge updates immediately after a resolve.
 
 ### Shared budget additions (requirement, not yet designed on this screen)
