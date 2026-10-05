@@ -58,7 +58,7 @@ import com.expensetracker.pocket.PocketCords
 import com.expensetracker.pocket.PocketEvent
 
 private val HeroMinHeight = 196.dp
-private val PocketSize = 136.dp
+private val PocketSize = 184.dp
 
 /** The Overview: one hero, one pending row, only the categories that need attention (handoff 01). */
 @Composable
@@ -140,7 +140,7 @@ private fun HeroCard(hero: HeroBudget, daysToGo: DaysToGo?, showPocket: Boolean,
         if (showPocket) {
             Pocket(
                 budget = hero.toPocketBudget(),
-                modifier = Modifier.size(PocketSize).align(Alignment.BottomEnd).offset(x = 8.dp, y = 14.dp),
+                modifier = Modifier.size(PocketSize).align(Alignment.BottomEnd).offset(x = 20.dp, y = 16.dp),
                 event = pocketEvent,
                 cords = PocketCords.ContrastGold,
             )
