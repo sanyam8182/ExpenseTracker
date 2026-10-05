@@ -83,7 +83,7 @@ fun OverviewScreen(
         HeroCard(hero, state.daysToGo, showPocket, pocketEvent)
         hero.pending?.let { PendingRow(it.amount, it.items) }
         if (limited.isNotEmpty()) {
-            NeedsALookList(attention)
+            NeedsALookList(attention, state.firstThresholdPercent)
             if (onTrackCount > 0 || noLimitCount > 0) OnTrackRow(onTrackCount, noLimitCount)
         }
         Spacer(Modifier.height(96.dp)) // room for the add-expense button
@@ -174,7 +174,7 @@ private fun PendingRow(amount: Paise, items: Int) {
 }
 
 @Composable
-private fun NeedsALookList(attention: List<Pair<String, CategoryBudget>>) {
+private fun NeedsALookList(attention: List<Pair<String, CategoryBudget>>, firstThresholdPercent: Int) {
     Text(stringResource(R.string.needs_a_look), style = MaterialTheme.typography.titleMedium)
     if (attention.isEmpty()) {
         Text(stringResource(R.string.all_on_track), style = MaterialTheme.typography.bodyLarge, color = MaterialTheme.colorScheme.onSurfaceVariant)
@@ -188,16 +188,16 @@ private fun NeedsALookList(attention: List<Pair<String, CategoryBudget>>) {
         Column {
             attention.forEachIndexed { index, (name, budget) ->
                 if (index > 0) Box(Modifier.fillMaxWidth().height(1.dp).background(MaterialTheme.colorScheme.outlineVariant))
-                AttentionRow(name, budget)
+                AttentionRow(name, budget, firstThresholdPercent)
             }
         }
     }
 }
 
 @Composable
-private fun AttentionRow(name: String, budget: CategoryBudget) {
+private fun AttentionRow(name: String, budget: CategoryBudget, firstThresholdPercent: Int) {
     val extra = ExpenseTrackerTheme.extraColors
-    val status = categoryStatus(budget, firstThresholdPercent = 0)
+    val status = categoryStatus(budget, firstThresholdPercent)
     val limit = budget.limit ?: return
     val (color, text) = when (status) {
         is CategoryStatus.OverBudget -> MaterialTheme.colorScheme.error to stringResource(R.string.status_over_budget_by, IndianCurrency.format(status.by))

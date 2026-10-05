@@ -22,7 +22,7 @@ Requirements: UI 01, BUD 02, BUD 05, CAT 02, FBK 01, FBK 02, FBK 03, CAP 04, AC 
 5. **"Needs a look"** (title-small): one white list card, rows separated by hairlines.
    - Row: category name (16/600), right-aligned "₹4,400 of ₹4,000" (14 secondary), status line with icon and words, thin progress bar (6 dp, track `outlineVariant`, fill = status colour; over budget = full bar).
    - Content: only categories over budget or at or above the user's first warning threshold. Order: over budget first, then by percentage used, highest first.
-   - Status words: "Over budget by ₹400" (alert-circle, error) and "80% used" (alert-triangle, warning). Use the user's configured percentage in the words.
+   - Status words: "Over budget by ₹400" (alert-circle, error) and "80% used" (alert-triangle, warning). Show the real percent used, rounded down (97% used, not the 80% threshold that triggered it).
    - None qualify: one line "All categories on track."
 6. **On-track row:** check icon + "2 more on track. 7 have no limit." + chevron. Counts: categories with a limit that are below the threshold, then categories with no limit.
 7. **Extended FAB** "Add expense" (56 dp, bottom-right above the nav bar).
