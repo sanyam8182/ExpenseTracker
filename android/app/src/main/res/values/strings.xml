@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">Expense Tracker</string>
+
+    <string name="tab_overview">Overview</string>
+    <string name="tab_transactions">Transactions</string>
+    <string name="tab_review">Review</string>
+    <string name="tab_budget">Budget</string>
+    <string name="add_expense">Add expense</string>
+    <string name="more_options">More options</string>
+    <string name="coming_soon">Not built yet</string>
+
+    <string name="sync_synced_just_now">Synced just now</string>
+    <string name="sync_synced_minutes">Synced %1$d min ago</string>
+    <string name="sync_syncing">Syncing</string>
+    <string name="sync_pending">Pending</string>
+    <string name="sync_stale_minutes">Stale, %1$d min ago</string>
+    <string name="sync_never">Never synced</string>
+    <string name="sync_failed">Failed</string>
+    <string name="sync_revoked">Access revoked</string>
+    <string name="sync_refresh_action">Refresh</string>
+
+    <string name="hero_left_to_spend">Left to spend</string>
+    <string name="hero_over_budget_by">Over budget by</string>
+    <string name="hero_spent_this_month">Spent this month</string>
+    <string name="hero_of_limits">of %1$s in limits</string>
+    <string name="hero_days_to_go">%1$d days to go</string>
+    <string name="hero_one_day_to_go">1 day to go</string>
+    <string name="hero_last_day">Last day</string>
+    <string name="hero_not_counting">Not counting</string>
+    <string name="hero_pending_amount">%1$s pending</string>
+    <string name="hero_description">%1$s, %2$s</string>
+    <string name="hero_description_limits">of %1$s in limits</string>
+    <string name="hero_description_pending">Not counting %1$s pending</string>
+
+    <string name="pending_row_title">Pending review %1$s (%2$s)</string>
+    <string name="pending_row_subtitle">Balances are incomplete</string>
+    <plurals name="review_items">
+        <item quantity="one">%d item</item>
+        <item quantity="other">%d items</item>
+    </plurals>
+
+    <string name="needs_a_look">Needs a look</string>
+    <string name="all_on_track">All categories on track.</string>
+    <string name="status_over_budget_by">Over budget by %1$s</string>
+    <string name="status_percent_used">%1$d%% used</string>
+    <string name="category_spent_of_limit">%1$s of %2$s</string>
+    <plurals name="more_on_track">
+        <item quantity="one">%d more on track</item>
+        <item quantity="other">%d more on track</item>
+    </plurals>
+    <plurals name="have_no_limit">
+        <item quantity="one">%d has no limit</item>
+        <item quantity="other">%d have no limit</item>
+    </plurals>
+</resources>
