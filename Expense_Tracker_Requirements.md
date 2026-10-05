@@ -23,7 +23,7 @@ Version 0.1 is preserved in `docs/archive/Expense_Tracker_Requirements_v0.1.md`.
 | Account holder | User who confirms a bank account/card belongs to them. Matching masked digits is insufficient. |
 | Drive file owner | Google identity owning a file. This identity has powers outside the app's role model. |
 | Personal budget | A user's own budget before/after sharing, or the invitee's separate ongoing budget. |
-| Shared budget | The owner's existing budget converted for an accepted membership interval. |
+| Shared budget | The owner's existing budget converted for an active membership interval. |
 | Membership interval / epoch | From the recorded join time to completed termination; rejoining creates a new epoch. |
 | Candidate | Captured event not yet accepted as a counted expense. A bank-posted payment can still be pending app review. |
 | Uncategorized | Review bucket; it is not a counted category in version 0.2. |
@@ -46,9 +46,9 @@ Version 0.1 is preserved in `docs/archive/Expense_Tracker_Requirements_v0.1.md`.
 
 ### BUD 01 — Budget identity and lifecycle
 
-A user begins with one personal budget. Acceptance is the invitee tapping Accept in the app (MEM 01); sharing starts at the recorded join time. The owner's existing budget ID then becomes shared; the owner has no additional personal budget. The invitee retains their own personal budget. Ending membership returns the owner's budget to personal use with the same ID and retained contributions. No administrator role exists.
+A user begins with one personal budget. Sharing starts when the invitee's app joins automatically on finding the shared Sheet (MEM 01), at the recorded join time. The owner's existing budget ID then becomes shared; the owner has no additional personal budget. The invitee retains their own personal budget. Ending membership returns the owner's budget to personal use with the same ID and retained contributions. No administrator role exists.
 
-A user may participate in at most one active shared relationship, either as its owner or invitee. An invitee cannot share their separate personal budget with a third person while already a member. Reject reciprocal invitations, third members and overlapping memberships. A pending invitation (Sheet shared, not accepted) can be declined or cancelled (owner removes the Google share) without changing budgets. Recheck eligibility when the invitee taps Accept and when the owner's app processes the join, not only when inviting.
+A user may participate in at most one active shared relationship, either as its owner or invitee. An invitee cannot share their separate personal budget with a third person while already a member. Reject reciprocal invitations, third members and overlapping memberships. A shared Sheet the invitee has not joined yet can be withdrawn (owner removes the Google share) without changing budgets. Recheck eligibility when the invitee's app joins and when the owner's app processes the join, not only when inviting.
 
 ### BUD 02 — Monetary calculation
 
@@ -70,16 +70,16 @@ Automatic records use bank occurrence timestamp when available; preserve receive
 
 Past-month limits are locked. Configure current/future limits only; no automatic propagation to other months and no rollover of unused/overspent amounts. A new month with no configured limit is “No limit,” not a guessed copy of the previous month. Locking limits does not lock spent totals: authorized corrections/refunds can recalculate historical spending under CAT 03/TXN 03. Closed shared history follows MEM 04 instead.
 
-### MEM 01 — Invitation by sharing the Sheet
+### MEM 01 — Sharing the Sheet and automatic join
 
-An invitation is a normal Google share of the budget's Sheet. There are no separate invitation, reply or membership files, and the app does not send email itself.
+Sharing is a normal Google share of the budget's Sheet. There are no separate invitation, reply or membership files, and the app does not send email itself. There is no Accept or Decline step (user decision, 5 October 2026, revising D-02): the recipient's app joins by itself when it finds the Sheet.
 
-1. Owner enters the recipient's Google email. The app creates the shared-budget Sheet, named with the fixed prefix `ExpenseTracker Shared –` and with a first tab `_meta` holding the budget ID and schema version, then shares it with that account as editor (link sharing off, resharing disabled where supported). No financial data is written yet. Google sends the invitation email.
-2. The recipient's app finds shared budgets automatically: Sheets owned by someone else, shared with the signed-in account, that carry the marker (name prefix and `_meta` tab). It lists them as pending invitations showing the owner's email. Nothing changes until the recipient taps **Accept**.
-3. On Accept, after the disclosures in HIST 01 and SEC 01, the invitee's app writes one `joined` row (account ID and time) to its own operations tab. That time is the sharing start. Declining or ignoring writes nothing; the app remembers the declined Sheet locally and the owner can remove the Google share.
+1. Owner enters the recipient's Google email. Before sharing, the invite screen tells the owner what the other person will see (HIST 01) and that any editor can read or change the Sheet outside the app (MEM 02). The app creates the shared-budget Sheet, named with the fixed prefix `ExpenseTracker Shared –` and with a first tab `_meta` holding the budget ID and schema version, then shares it with that account as editor (link sharing off, resharing disabled where supported). No financial data is written yet. Google sends its usual sharing email.
+2. The recipient's app finds shared budgets automatically: Sheets owned by someone else, shared with the signed-in account, that carry the marker (name prefix and `_meta` tab). When it finds one and the recipient is not already in another shared relationship (BUD 01), it joins at once. Discovery runs when the app opens and on its normal refresh; no background timing is promised.
+3. On joining, the invitee's app writes one `joined` row (account ID and time) to its own operations tab. That time is the sharing start. Immediately afterwards the recipient sees a one-time notice with the owner's email, the disclosures in HIST 01 and SEC 01, and a **Leave** action (MEM 03). The notice informs; it is not a consent step, because sharing has already started.
 4. The owner's app sees the `joined` row on its next sync, checks that it names the invited account and that no other member is active, and writes the opening amounts (HIST 01) as of the join time. Until then the invitee sees “Joined; waiting for the owner's app to sync”. The invitee's expenses from the join time are queued and uploaded and count in shared totals from that time.
 
-The marked Sheet's Google share list plus its `joined`/`left` rows are the membership record. One invitee only: if any other account has access, or a second `joined` row appears, the app stops shared writes and shows a recovery issue. This is coordination between cooperating apps, not a trusted backend: anyone with editor access can edit cells (MEM 02). Cancel a pending invitation by removing the Google share.
+The marked Sheet's Google share list plus its `joined`/`left` rows are the membership record. One invitee only: if any other account has access, or a second `joined` row appears, the app stops shared writes and shows a recovery issue. This is coordination between cooperating apps, not a trusted backend: anyone with editor access can edit cells (MEM 02). Remove access, before or after the person has joined, by removing the Google share. Accepted limitation (user decision, 5 October 2026): because joining is automatic, anyone who knows a user's Google email could share a marked Sheet with that user and start a join. The one-member rule (BUD 01) still applies, the person can Leave at once and nothing from before the join is shared, but purchases made after joining are visible to that owner until the person leaves.
 
 ### MEM 02 — App roles and acknowledged limits
 
@@ -95,7 +95,7 @@ Owner removal requires connectivity. The owner's app writes a `removing` row, su
 
 Invitee “Leave” immediately pauses their shared queue, routes new local purchases personal-only and writes a `left` row with the time. Until the owner's app removes the Google access, show “Left; the owner's app must remove access” and do not claim global termination. Invitee transactions after the `left` time are excluded by supported clients once the owner's app processes it. The record keeps leave time, effective attribution cutoff and completed access-removal time separately.
 
-At next connection, revoked invitee clears inaccessible shared cache, preserving own personal records/history. Cached/exported offline copies cannot be remotely erased. Rejoin requires a fresh accepted invitation and epoch. Retained old shared totals stay with owner, but old Sheet grants are never reinstated.
+At next connection, revoked invitee clears inaccessible shared cache, preserving own personal records/history. Cached/exported offline copies cannot be remotely erased. Rejoin requires a fresh share of a new Sheet and a new epoch. Retained old shared totals stay with owner, but old Sheet grants are never reinstated.
 
 ### MEM 04 — Late events, date corrections and closed history
 
@@ -109,7 +109,7 @@ Offline captures can queue during active membership. Before each upload, refresh
 
 Only owner category/month opening amounts and shared-interval detail are visible to the invitee. When the owner's app processes the `joined` row, copy current-month net spending before the join time as one opening component per category attributed to the budget owner; do not upload pre-sharing transaction IDs, merchants, notes, accounts or dates. Owner keeps details locally. Limits/current-month totals remain unchanged.
 
-During an active sharing epoch, each member is informed before acceptance that the other member can see the shared-epoch transaction details exposed by the app (merchant/payee when present, amount, date, category/intent and spender). There is no per-transaction privacy switch in v0.2. The disclosure also states that an authorized Google editor can inspect or change Sheet cells outside the app, which the server-free design cannot prevent.
+During an active sharing epoch, the owner is informed when inviting, and the invitee in a notice immediately after joining (with a Leave action), that the other member can see the shared-epoch transaction details exposed by the app (merchant/payee when present, amount, date, category/intent and spender). There is no per-transaction privacy switch in v0.2. The disclosure also states that an authorized Google editor can inspect or change Sheet cells outside the app, which the server-free design cannot prevent.
 
 While active, corrections/refunds to the owner's private opening purchases update only the relevant aggregate component and its version. No linked private transaction identifiers are exposed. Later month reports include only that epoch's visible activity. Invitee cannot browse owner's earlier months through app or Sheet. Shared reports identify an aggregate “Owner opening amount”; they must not claim it consists solely of individually visible purchases.
 
@@ -240,7 +240,7 @@ Always show last successful shared sync. Label “Pending” when local shared w
 - Overview: month and applicable budget selection; category limit/spent/remaining, opening/retained aggregate labels, pending review and sync freshness.
 - Transactions: filter by month, spender, category, account, payment method and review status; one logical payment with source aliases.
 - Review/details: safe evidence, single category, own corrections, refund linkage, audit history; no other-user editing actions.
-- Budgets/members: current/future limits, warning settings, invite by email, pending invitations to accept or decline, join/leave/removal pending states and permission-limit disclosure.
+- Budgets/members: current/future limits, warning settings, invite by email, automatic join with a one-time notice and Leave, join/leave/removal pending states and permission-limit disclosure.
 - Settings/recovery: source packages and permissions, notification privacy, remembered rules, export reminders/export/restore, deleted items, full local wipe.
 - Functional screens are implementation work now; their styling/navigation composition remains design work. Do not hide uncertainty or unsupported behavior behind a “synced” label.
 
@@ -262,7 +262,7 @@ Archive closed Sheet owner-only and create a new one on rejoin (HIST 01). Export
 | --- | --- |
 | User/device/account | Stable Google ID, canonical email, device installation ID, account ID/bank/type/masked identifier/confirmed holder. |
 | Budget/limit | Stable budget ID, owner, current state, INR/timezone, category/month/paise limit and threshold version. |
-| Membership | Budget/epoch IDs, invited email, status (invited/active/removing/ended), joined/left/ended timestamps, Sheet ID. |
+| Membership | Budget/epoch IDs, invited email, status (shared-not-joined/active/removing/ended), joined/left/ended timestamps, Sheet ID. |
 | Transaction | Stable ID, spender, confirmed account if known, amount/currency, direction/type/payment state, date source/precision, occurrence and received times, payee/method/notes/reference. |
 | Review/classification | Explicit gates, reason, duplicate cluster, category, rule ID/version, optional sanitized excerpt. |
 | Attribution/opening | Budget/epoch, transaction ID or aggregate component ID, month/category/paise contribution, opening/retained label; never private detail IDs in shared opening rows. |
@@ -292,7 +292,7 @@ Include schema version and required tab/column definitions. If a newer/incompati
 
 Google sign-in is required for app use; previous valid local session supports offline operation. A signed-out app cannot open protected data; account switch isolates datasets. Use account-bound credentials, minimum viable API scopes and a check that a join request comes from the invited account. No backend secrets in APK.
 
-App rules protect compliant supported flows; they do not defeat Google file owners/editors who use other tools. Explain this at sharing acceptance. Disable link-wide/public access; having Google access to a marked Sheet does not make anyone a member until they tap Accept. Production security claims must be limited to what the permission spike demonstrates.
+App rules protect compliant supported flows; they do not defeat Google file owners/editors who use other tools. Explain this at invite time and in the post-join notice. Disable link-wide/public access; having Google access to a marked Sheet does not make anyone a member until their app joins by writing a `joined` row. Production security claims must be limited to what the permission spike demonstrates.
 
 ### SEC 02 — Revocation and replacement
 
@@ -331,7 +331,7 @@ AC 01–70 keep their identifiers and take the revised behavior below. AC 71–7
 | AC 01 | BUD 03 | Invitee's confirmed ₹1,000 Fashion purchase reduces personal/shared remaining from ₹4,000/₹5,000 to ₹3,000/₹4,000 with one logical ID. |
 | AC 02 | CAP 05; SYN 02 | SMS, notification and sync replay of a strongly matched purchase count once; distinct equal-value references remain separate. |
 | AC 03 | BUD 01; BUD 03 | Owner spending affects only converted shared budget; invitee spending affects personal plus shared; owner has no extra personal budget. |
-| AC 04 | MEM 01; MEM 03; MEM 04 | A pending invitation (Sheet shared, not accepted) changes neither budget; the invitee's Accept starts sharing from the recorded join time and converts the owner's budget once the owner's app processes it; completed removal returns it to personal without reducing retained spend. Pending removal is visibly incomplete. |
+| AC 04 | MEM 01; MEM 03; MEM 04 | A shared Sheet with no `joined` row yet changes neither budget; the invitee's app joining automatically starts sharing from the recorded join time and converts the owner's budget once the owner's app processes it; completed removal returns it to personal without reducing retained spend. Pending removal is visibly incomplete. |
 | AC 05 | TXN 02 | Own-account/inter-user transfers and card repayment add zero; original card purchase counts once. |
 | AC 06 | TXN 01; TXN 03 | OTP/request/failed payment adds no expense; confirmed partial refund changes original open projections once. |
 | AC 07 | CAT 01; CAT 02; TXN 01 | Unknown merchant/category remains pending and outside all totals. Confirming Fashion adds its full amount once to each eligible budget. This replaces v0.1's counted Uncategorized behavior. |
@@ -351,7 +351,7 @@ AC 01–70 keep their identifiers and take the revised behavior below. AC 71–7
 | AC 21 | FBK 03 | Default locked-device notification reveals no amount, merchant, category or balance; unlocked content and explicit privacy preference work. |
 | AC 22 | FBK 02 | 80%/100% crossings alert once; duplicate replay does not. Owner controls shared configuration, personal user theirs; configuration edits establish baseline without replay. |
 | AC 23 | SYN 01; FBK 03 | Offline shared change shows pending, survives restart and synchronizes once logically after eligible trigger; other device updates on its next sync. |
-| AC 24 | MEM 01 | Creator is owner; owner shares the Sheet with the invitee's Google email; the invitee's app discovers it automatically and shows a pending invitation; sharing starts only when the invitee taps Accept. No financial data is written before the join is processed. |
+| AC 24 | MEM 01 | Creator is owner; owner shares the Sheet with the invitee's Google email; the invitee's app discovers it automatically and joins, then shows a one-time notice with a Leave action; sharing starts at the recorded join time. No financial data is written before the join is processed. |
 | AC 25 | MEM 02; SYN 03 | Both users may view reports and have disclosed Google edit access for sync. Supported changes use app roles; manual cell edits are unsupported and detectable structural damage blocks writes. No read-only-source guarantee is asserted. |
 | AC 26 | CAP 04 | New account remains unconfirmed/unattributed until explicit confirmation; matching last four across different banks does not merge ownership. |
 | AC 27 | CAT 01; CAT 02 | Exact validated/remembered unambiguous rule auto-classifies; low confidence, unknown, duplicate or ambiguous transfer remains excluded until all review gates pass. |
@@ -396,11 +396,11 @@ AC 01–70 keep their identifiers and take the revised behavior below. AC 71–7
 | AC 66 | ARC 01; CAP 01 | Actual private APK install on each pilot phone documents restricted-settings behavior, posting/listener/SMS consent and recovery after battery restrictions. |
 | AC 67 | REC 01 | After 7 days of unexported changed data reminder appears without blocking use; recent-export date visible; loss risk explained; platform backup excludes key-dependent DB/excerpts/tokens. |
 | AC 68 | SYN 02; SYN 03 | Invitee sync can update app ledger before owner report rebuild; report timestamp/pending state makes owner-online dependency explicit. |
-| AC 69 | BUD 01; MEM 01 | A third account with access, an invitee trying to share their personal budget while a member, reciprocal invitations and a second `joined` row are rejected at Accept and when the owner's app processes the join. |
+| AC 69 | BUD 01; MEM 01 | A third account with access, an invitee trying to share their personal budget while a member, reciprocal invitations and a second `joined` row are rejected at join and when the owner's app processes the join. |
 | AC 70 | BUD 05; NFR 01 | Next month without configured limits shows No limit; no rollover/copy assumption; logs/crash reports contain no secrets, raw alerts or private financial payload. |
 | AC 71 | CAT 01; TXN 02 | A remembered rule can set purchase, transfer/repayment or excluded intent (and a fixed category for purchases); it applies only to future own candidates after normal account/date/duplicate gates, and can be removed. |
 | AC 72 | CAP 04; BUD 04 | Confirming an account re-evaluates earlier captured candidates in their original occurrence/receipt month; items without a usable date remain in review and do not count merely because the account was confirmed. |
-| AC 73 | HIST 01; SEC 01 | Before accepting sharing, each member is told that active-epoch merchants, amounts, dates, categories/intents and spender attribution are visible to the other member and that no per-transaction exclusion exists in v0.2. |
+| AC 73 | HIST 01; SEC 01 | The owner is told when inviting, and the invitee in a notice immediately after joining (with a Leave action), that active-epoch merchants, amounts, dates, categories/intents and spender attribution are visible to the other member and that no per-transaction exclusion exists in v0.2. |
 | AC 74 | REC 01; SEC 02; SPIKE-01; SPIKE-05 | Setup and recovery first test same-owner reinstall and automatic rediscovery of the owner's marked Sheet. If that fails or the Sheet is unreadable, an invitee cannot rebuild or revoke sharing; the app marks recovery blocked and preserves local data. |
 | AC 75 | NFR 02 | Every >2,000 ms run is retained with cause classification; one documented controlled rerun may supplement it, but cannot hide the original outlier or convert a repeated failure into a pass. |
 | AC 76 | NFR 02; CAP 02 | [D-12, proposed] Gate 3 parser receipt-rate measurement names its ground truth (statement or alert log plus user confirmation) and reports fixture/live sample sizes; provisional thresholds remain visibly proposed until SPIKE-03 evidence and explicit approval. |
@@ -418,7 +418,7 @@ The tags in this matrix are the decision tags for the affected normative section
 | ID | Decision in v0.2 | Approval status | Disposition |
 | --- | --- | --- | --- |
 | D-01 | Server-free, cooperating-client model; users may retain Google editor powers beyond app rules. | **Approved by user — 1 October 2026** | Replaces all-path/readonly-source security guarantees. |
-| D-02 | Invite by sharing the marked Sheet with the invitee's Google email; the app finds shared budgets automatically (broader Drive listing permission accepted for the pilot); the invitee's Accept in the app starts sharing; leave and removal are recorded in the Sheet and the owner removes Google access. | **Approved by user — 5 October 2026** | SPIKE-01/02 verify discovery, scopes, permissions and failure handling before sharing build; fall back to one-time file picker if Google blocks listing. |
+| D-02 | Invite by sharing the marked Sheet with the invitee's Google email; the app finds shared budgets automatically (broader Drive listing permission accepted for the pilot); the invitee's app joins automatically when it finds the Sheet and shows a notice with Leave (no Accept step); leave and removal are recorded in the Sheet and the owner removes Google access. | **Approved by user — 5 October 2026** (revised the same day: Accept removed, automatic join with a post-join notice) | SPIKE-01/02 verify discovery, scopes, permissions and failure handling before sharing build; fall back to one-time file picker if Google blocks listing. Accepted limitation: anyone who knows a Google email can start a join by sharing a marked Sheet; mitigated by the one-member rule, the post-join notice and Leave. |
 | D-03 | Safe opening aggregates; new Sheet per epoch; no pre-sharing detailed history. | **Approved by user — 5 October 2026** | Planning choice that closes the initial BL 01 privacy gap while preserving budgets. |
 | D-04 | Frozen closed history; personal-only post-removal edits; no owner review queue in first release. | **Approved by user — 5 October 2026** | Planning choice; extended reconciliation remains deferred. |
 | D-05 | All unresolved counting gates, including category, excluded; explicit pending exposure. | **Approved by user — 5 October 2026** | The reversal of counted Uncategorized in old CAT 02/AC 07 is in effect. |
@@ -447,7 +447,7 @@ The register distinguishes the explicitly approved decisions (D-01, D-02, D-03, 
 ### Gate 0 — Evidence before architecture-dependent implementation
 
 - SPIKE-01: with both Google accounts demonstrate that the chosen scopes can list Sheets shared with the user by name and owner and read/write the marked Sheet (fallback: one-time file picker); sharing, removing access and disabling resharing; whether the invitee's app can read the Sheet's share list. Record manual-edit limitations and OAuth Testing/re-auth behavior (seven-day expiry). Reinstall the same build as the same owner account and test whether the owner's app rediscovers the marked Sheet; distinguish that recoverable case from loss of device-only credentials before designing AC 74's blocked state. No real financial data needed.
-- SPIKE-02: execute the full flow: invite, automatic discovery, Accept/decline, owner's app processing the `joined` row, leave and removal, including a wrong account, a second member, owner offline and partial failure (access removed but `ended` not written). No financial data is written before the join is processed.
+- SPIKE-02: execute the full flow: invite, automatic discovery and join, the post-join notice, owner's app processing the `joined` row, leave and removal, including a wrong account, a Sheet shared by an unexpected owner, a second member, owner offline and partial failure (access removed but `ended` not written). No financial data is written before the join is processed.
 - SPIKE-03: **start first**; collect/redact actual alert fixtures for HDFC, SBI, SBM, Kotak and Axis pilot combinations and enumerate real package names. Agree the supported matrix, the statement/alert-log ground truth and the fixture/live sample plan before writing broad parser claims or sizing Gate 3 thresholds.
 - SPIKE-04: install private APK on both actual Android 16 phones; validate restricted settings, permission denial, battery behavior, background receipt and notification posting.
 - SPIKE-05: demonstrate SQLCipher/Room/Keystore compatibility, process restart, portable encrypted export and replacement restore without copying device keys. Include same-owner reinstall with an existing marked Sheet and record whether the app rediscovers it under the same account.
@@ -458,7 +458,7 @@ Local encryption, capture/manual entry, review/counting, categories, money flows
 
 ### Gate 2 — Shared checkpoint
 
-Invitation/accept, app roles/trust disclosures, safe opening data, deterministic event folding, conflicts, report freshness, leave/removal, frozen history and fresh-Sheet rejoin meet the mapped criteria. Pass Gate 0 sharing spikes first.
+Sharing and automatic join, app roles/trust disclosures, safe opening data, deterministic event folding, conflicts, report freshness, leave/removal, frozen history and fresh-Sheet rejoin meet the mapped criteria. Pass Gate 0 sharing spikes first.
 
 ### Gate 3 — Measured pilot exit [D-12, proposed]
 

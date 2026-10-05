@@ -18,8 +18,8 @@ Current artifacts:
 ## Material decisions
 
 - App roles are enforced by compliant app flows. Google file owners/editors can bypass them externally. Manual cell editing remains unsupported; no read-only-to-owner or tamper-proof claim.
-- Keep one actively shared financial Sheet. Invitation is a normal Google share of a marked Sheet, found automatically by the invitee's app; the invitee's Accept in the app starts sharing (broader Drive listing permission accepted for the pilot, one-time file picker as fallback). This is approved (D-02, 5 October 2026); SPIKE-01 must still verify it.
-- Acceptance is the invitee tapping Accept in the app, recorded as a `joined` row. Leaving writes a `left` row and stops local sharing immediately; the owner's app removes the Google access and records `ended`.
+- Keep one actively shared financial Sheet. Invitation is a normal Google share of a marked Sheet, found automatically by the invitee's app; the invitee's app joins automatically and shows a notice with Leave (no Accept step, revised 5 October 2026) (broader Drive listing permission accepted for the pilot, one-time file picker as fallback). This is approved (D-02, 5 October 2026); SPIKE-01 must still verify it.
+- Joining is automatic when the invitee's app finds the Sheet, recorded as a `joined` row; the invitee then sees a notice with a Leave action. Leaving writes a `left` row and stops local sharing immediately; the owner's app removes the Google access and records `ended`.
 - Private historical details stay local. Shared current-month totals use safe opening aggregates. Archive old Sheet owner-only on termination; create new Sheet for each rejoin (approved as D-03, 5 October 2026).
 - Retained former-member contributions freeze at closure. No post-removal owner review queue; personal corrections remain possible. Owner's own continuing personal records remain editable without rewriting archived shared snapshot.
 - All unresolved review gates, including category, exclude spending. Show provisional known-INR exposure separately; the reversal of counted Uncategorized is approved (D-05, 5 October 2026).
@@ -33,7 +33,7 @@ Current artifacts:
 | --- | --- | --- |
 | Sheet permissions and two-writer concerns | MEM 02 acknowledges limitations; SYN 02 folds stable-ID events rather than promising exactly-once append. | SPIKE-01; US-016; US-018 |
 | Drive scopes and OAuth expiry | ARC 01 proposes Drive listing plus Sheets access for automatic discovery, with the file picker as fallback, and requires reauthorization handling. | SPIKE-01; US-001 |
-| Missing invitation delivery/authority | MEM 01 invitation by sharing the marked Sheet; automatic discovery; Accept in the app; one-invitee and join-account checks. | SPIKE-02; US-014 |
+| Missing invitation delivery/authority | MEM 01 invitation by sharing the marked Sheet; automatic discovery; automatic join with a post-join notice; one-invitee and join-account checks. | SPIKE-02; US-014 |
 | Pre-sharing private history | HIST 01 safe aggregates, private identifiers excluded, fresh Sheet on rejoin. | US-012; US-017 |
 | Post-removal queue versus BL 03 | MEM 04 defers queue, freezes retained former-member spend and flags rejected late writes. | US-015; US-010 |
 | Counting ambiguity | TXN 01 truth table, CAT 02 pending view and revised AC 07. | US-007; US-008 |

@@ -40,7 +40,7 @@ The backlog is derived from the requirements and may clarify ownership or gate c
 | EPIC-06 | Epic | — | Shared synchronization and data recovery |
 | EPIC-07 | Epic | — | Pilot evidence and release gates |
 | SPIKE-01 | Task | EPIC-05 | Prove Drive scopes and disclosed permission model |
-| SPIKE-02 | Task | EPIC-05 | Prove Sheet-share invitation, discovery and removal |
+| SPIKE-02 | Task | EPIC-05 | Prove Sheet sharing, automatic join and removal |
 | SPIKE-03 | Task | EPIC-02 | Collect five-bank fixtures and define supported matrix |
 | SPIKE-04 | Task | EPIC-01 | Validate APK permissions and Samsung execution behavior |
 | SPIKE-05 | Task | EPIC-01 | Prove encrypted persistence and portable recovery stack |
@@ -66,7 +66,7 @@ The backlog is derived from the requirements and may clarify ownership or gate c
 | US-011 | Story | EPIC-04 | Configure fixed-category monthly budgets |
 | US-012 | Story | EPIC-04 | Calculate applicable budgets and safe opening amounts |
 | US-013 | Story | EPIC-04 | Configure warnings and show private, fresh feedback |
-| US-014 | Story | EPIC-05 | Invite by sharing the Sheet and accept in the app |
+| US-014 | Story | EPIC-05 | Share the Sheet and join automatically |
 | US-015 | Story | EPIC-05 | Complete leave/removal and rejoin with a fresh Sheet |
 | US-016 | Story | EPIC-05 | Enforce supported app roles and disclose Google powers |
 | US-017 | Story | EPIC-06 | Create epoch files and privacy-safe shared reports |
@@ -78,7 +78,7 @@ The backlog is derived from the requirements and may clarify ownership or gate c
 | US-023 | Story | EPIC-04 | Browse overview, transactions and audit detail |
 | US-024 | Story | EPIC-06 | Wipe local data with explicit scope |
 | US-025 | Story | EPIC-02 | Handle safe review excerpts and unsupported sources/currency |
-| SUB-101 | Subtask | US-014 | Implement shared-budget discovery and Accept/Decline |
+| SUB-101 | Subtask | US-014 | Implement shared-budget discovery and automatic join |
 | SUB-102 | Subtask | US-014 | Process the join and handle partial failure |
 | SUB-103 | Subtask | US-015 | Implement owner-online revocation state machine |
 | SUB-104 | Subtask | US-015 | Archive ended epoch and allocate new Sheet on rejoin |
@@ -928,7 +928,7 @@ The backlog is derived from the requirements and may clarify ownership or gate c
 
  - [ ] **AC 01 [Gate 2]:** Invitee's confirmed ₹1,000 Fashion purchase reduces personal/shared remaining from ₹4,000/₹5,000 to ₹3,000/₹4,000 with one logical ID.
  - [ ] **AC 03 [Gate 2]:** Owner spending affects only converted shared budget; invitee spending affects personal plus shared; owner has no extra personal budget.
- - [ ] **AC 04 [Gate 2]:** A pending invitation (Sheet shared, not accepted) changes neither budget; the invitee's Accept starts sharing from the recorded join time and converts the owner's budget once the owner's app processes it; completed removal returns it to personal without reducing retained spend. Pending removal is visibly incomplete.
+ - [ ] **AC 04 [Gate 2]:** A shared Sheet with no `joined` row yet changes neither budget; the invitee's app joining automatically starts sharing from the recorded join time and converts the owner's budget once the owner's app processes it; completed removal returns it to personal without reducing retained spend. Pending removal is visibly incomplete.
  - [ ] **AC 11 [Gate 2]:** Neither participant sees invitee personal-only data; invitee sees owner opening aggregates but no pre-sharing details; completed revocation blocks future Drive writes.
  - [ ] **AC 13 [Gate 2]:** Owner ₹5,000 limit and ₹1,000 spent remain ₹4,000 available when sharing starts; ₹1,000 is a private-detail-free opening amount. Invitee's later ₹500 adds once to both budgets; earlier invitee transactions stay private.
  - [ ] **AC 30 [Gate 2]:** Rejoin uses new epoch and Sheet; gap expenses/details are not imported; owner retains old snapshot; safe current-month prior-spend aggregates preserve totals.
@@ -1020,15 +1020,15 @@ The backlog is derived from the requirements and may clarify ownership or gate c
 **Source acceptance:** AC 04; AC 11; AC 15; AC 16; AC 24; AC 25; AC 30; AC 43; AC 44; AC 47; AC 48; AC 49; AC 69  
 **Blocked by:** None  
 
-**Description:** Invite by sharing the marked Sheet, discover it automatically, start sharing when the invitee accepts in the app, and end it by owner removal or invitee leave; disclose app-only enforcement and prevent accidental private-history exposure.
+**Description:** Share the marked Sheet, let the invitee's app discover it and join automatically, and end it by owner removal or invitee leave; disclose app-only enforcement and prevent accidental private-history exposure.
 
 **Acceptance criteria:**
 
-- [ ] **AC 04:** A pending invitation (Sheet shared, not accepted) changes neither budget; the invitee's Accept starts sharing from the recorded join time and converts the owner's budget once the owner's app processes it; completed removal returns it to personal without reducing retained spend. Pending removal is visibly incomplete.
+- [ ] **AC 04:** A shared Sheet with no `joined` row yet changes neither budget; the invitee's app joining automatically starts sharing from the recorded join time and converts the owner's budget once the owner's app processes it; completed removal returns it to personal without reducing retained spend. Pending removal is visibly incomplete.
 - [ ] **AC 11:** Neither participant sees invitee personal-only data; invitee sees owner opening aggregates but no pre-sharing details; completed revocation blocks future Drive writes.
 - [ ] **AC 15:** Owner can edit shared limit through app; invitee app/queued mutation is rejected without change. Invitee can edit personal limit. Onboarding explicitly discloses unsupported Google-editor bypass.
 - [ ] **AC 16:** Active user corrects only their own record; all open eligible projections update once and audit entry persists. Other user's app edits are rejected, including budget-owner attempts.
-- [ ] **AC 24:** Creator is owner; owner shares the Sheet with the invitee's Google email; the invitee's app discovers it automatically and shows a pending invitation; sharing starts only when the invitee taps Accept. No financial data is written before the join is processed.
+- [ ] **AC 24:** Creator is owner; owner shares the Sheet with the invitee's Google email; the invitee's app discovers it automatically and joins, then shows a one-time notice with a Leave action; sharing starts at the recorded join time. No financial data is written before the join is processed.
 - [ ] **AC 25:** Both users may view reports and have disclosed Google edit access for sync. Supported changes use app roles; manual cell edits are unsupported and detectable structural damage blocks writes. No read-only-source guarantee is asserted.
 - [ ] **AC 30:** Rejoin uses new epoch and Sheet; gap expenses/details are not imported; owner retains old snapshot; safe current-month prior-spend aggregates preserve totals.
 - [ ] **AC 43:** Owner removal completes only after confirmed revocation. Invitee leave pauses local sharing immediately but remote revocation remains pending owner processing. Next reconnect clears revoked cache, retaining personal copy.
@@ -1036,7 +1036,7 @@ The backlog is derived from the requirements and may clarify ownership or gate c
 - [ ] **AC 47:** Refund/correction to owner's pre-sharing purchase updates only safe opening aggregate while epoch active; no private transaction identifier/detail appears in Sheet.
 - [ ] **AC 48:** Discovery lists only marked Sheets owned by someone else and shared with the signed-in account; unmarked Sheets are ignored; a join from a non-invited account or a second member is rejected; a two-account test proves the scopes and permissions; a partial failure can retry safely.
 - [ ] **AC 49:** Owner offline cannot complete leave; UI states dependency. During closing, app upload pauses; stale queued event after revoked permission is kept personal and visibly rejected for sharing.
-- [ ] **AC 69:** A third account with access, an invitee trying to share their personal budget while a member, reciprocal invitations and a second `joined` row are rejected at Accept and when the owner's app processes the join.
+- [ ] **AC 69:** A third account with access, an invitee trying to share their personal budget while a member, reciprocal invitations and a second `joined` row are rejected at join and when the owner's app processes the join.
 
 
 **Evidence:** All child delivery criteria and the mapped integration scenarios have recorded passing evidence; open feasibility blockers cannot be waived as complete.
@@ -1066,84 +1066,84 @@ The backlog is derived from the requirements and may clarify ownership or gate c
 
 **Evidence:** Attach a dated experiment record with both-account/device setup where relevant, observed API behavior, failures and explicit pass/block outcome. A written proposal alone does not pass this spike.
 
-### SPIKE-02 — Prove Sheet-share invitation, discovery and removal
+### SPIKE-02 — Prove Sheet sharing, automatic join and removal
 
 **Issue type:** Task  
 **Project:** SCRUM  
 **Parent:** EPIC-05  
-**Summary:** Prove Sheet-share invitation, discovery and removal  
+**Summary:** Prove Sheet sharing, automatic join and removal  
 **Labels:** expense-tracker, v0-2, spike-02, spike  
 **Delivery gate:** Gate 0 – Feasibility  
 **Source requirements:** MEM 01; MEM 03  
 **Source acceptance:** AC 24; AC 43; AC 48; AC 49; AC 69  
 **Blocked by:** SPIKE-01  
 
-**Description:** Prototype the flow: share a marked Sheet, automatic discovery by the invitee's app, Accept/Decline, the `joined` row processed by the owner's app, leave and removal; no financial records.
+**Description:** Prototype the flow: share a marked Sheet, automatic discovery and join by the invitee's app, the `joined` row processed by the owner's app, leave and removal; no financial records.
 
 **Acceptance criteria:**
 
-- [ ] **AC 24:** Creator is owner; owner shares the Sheet with the invitee's Google email; the invitee's app discovers it automatically and shows a pending invitation; sharing starts only when the invitee taps Accept. No financial data is written before the join is processed.
+- [ ] **AC 24:** Creator is owner; owner shares the Sheet with the invitee's Google email; the invitee's app discovers it automatically and joins, then shows a one-time notice with a Leave action; sharing starts at the recorded join time. No financial data is written before the join is processed.
 - [ ] **AC 43:** Owner removal completes only after confirmed revocation. Invitee leave pauses local sharing immediately but remote revocation remains pending owner processing. Next reconnect clears revoked cache, retaining personal copy.
 - [ ] **AC 48:** Discovery lists only marked Sheets owned by someone else and shared with the signed-in account; unmarked Sheets are ignored; a join from a non-invited account or a second member is rejected; a two-account test proves the scopes and permissions; a partial failure can retry safely.
 - [ ] **AC 49:** Owner offline cannot complete leave; UI states dependency. During closing, app upload pauses; stale queued event after revoked permission is kept personal and visibly rejected for sharing.
-- [ ] **AC 69:** A third account with access, an invitee trying to share their personal budget while a member, reciprocal invitations and a second `joined` row are rejected at Accept and when the owner's app processes the join.
+- [ ] **AC 69:** A third account with access, an invitee trying to share their personal budget while a member, reciprocal invitations and a second `joined` row are rejected at join and when the owner's app processes the join.
 - [ ] A join from a non-invited account, a second member and a partial failure (access removed but `ended` not written) cannot create or keep a membership.
 - [ ] Record expected behavior while the owner's app is offline; no server is introduced and the app sends no email itself.
 
 **Evidence:** Attach a dated experiment record with both-account/device setup where relevant, observed API behavior, failures and explicit pass/block outcome. A written proposal alone does not pass this spike.
 
-### US-014 — Invite by sharing the Sheet and accept in the app
+### US-014 — Share the Sheet and join automatically
 
 **Issue type:** Story  
 **Project:** SCRUM  
 **Parent:** EPIC-05  
-**Summary:** Invite by sharing the Sheet and accept in the app  
+**Summary:** Share the Sheet and join automatically  
 **Labels:** expense-tracker, v0-2, us-014  
 **Delivery gate:** Gate 2 – Shared  
 **Source requirements:** MEM 01; BUD 01; ARC 01  
 **Source acceptance:** AC 24; AC 48; AC 69; AC 73  
 **Blocked by:** SPIKE-01, SPIKE-02, US-001, US-017  
 
-**Description:** As a budget owner and recipient, we want the invitation to be a normal Google share that the recipient's app discovers, so sharing begins only when the recipient taps Accept.
+**Description:** As a budget owner and recipient, we want sharing to be a normal Google share that the recipient's app discovers and joins automatically, so sharing begins at the recorded join time and the recipient gets a notice and a Leave action.
 
 **Acceptance criteria:**
 
-- [ ] **AC 24:** Creator is owner; owner shares the Sheet with the invitee's Google email; the invitee's app discovers it automatically and shows a pending invitation; sharing starts only when the invitee taps Accept. No financial data is written before the join is processed.
+- [ ] **AC 24:** Creator is owner; owner shares the Sheet with the invitee's Google email; the invitee's app discovers it automatically and joins, then shows a one-time notice with a Leave action; sharing starts at the recorded join time. No financial data is written before the join is processed.
 - [ ] **AC 48:** Discovery lists only marked Sheets owned by someone else and shared with the signed-in account; unmarked Sheets are ignored; a join from a non-invited account or a second member is rejected; a two-account test proves the scopes and permissions; a partial failure can retry safely.
-- [ ] **AC 69:** A third account with access, an invitee trying to share their personal budget while a member, reciprocal invitations and a second `joined` row are rejected at Accept and when the owner's app processes the join.
+- [ ] **AC 69:** A third account with access, an invitee trying to share their personal budget while a member, reciprocal invitations and a second `joined` row are rejected at join and when the owner's app processes the join.
 - [ ] **AC 73 [Gate 2]:** Before acceptance, each member is told that active-epoch merchants, amounts, dates, categories/intents and spender attribution are visible to the other member and that no per-transaction exclusion exists in v0.2.
 - [ ] The owner enters a Google email; the app creates the Sheet with the fixed name prefix and a `_meta` tab (budget ID, schema version), shares it with that account as editor with link sharing off and resharing disabled where supported, and writes no financial data.
 - [ ] The recipient's app lists only marked Sheets owned by someone else and shared with the signed-in account; unmarked Sheets are never read.
-- [ ] Nothing changes until the recipient taps Accept after the visibility disclosures; declining or ignoring writes nothing and is remembered locally.
-- [ ] A pending invitation can be cancelled by removing the Google share, leaving both budgets unchanged.
-- [ ] Eligibility (one relationship, not already a member, no reciprocal invitation) is checked when sending, at Accept and when the owner's app processes the join.
+- [ ] The owner sees the visibility disclosures when inviting; the recipient's app joins automatically on discovery and shows a one-time notice with the same disclosures and a Leave action.
+- [ ] A shared Sheet the recipient has not joined yet can be withdrawn by removing the Google share, leaving both budgets unchanged.
+- [ ] Eligibility (one relationship, not already a member, no reciprocal invitation) is checked when sending, at join and when the owner's app processes the join.
 - [ ] The Google scopes used are the smallest set SPIKE-01 shows working, with the file picker as the fallback.
 
 
 **Evidence:** Record focused validation for the listed outcomes, negative paths and relevant data/permission boundaries. Link dependent integration evidence when the criterion spans multiple issues.
 
-#### SUB-101 — Implement shared-budget discovery and Accept/Decline
+#### SUB-101 — Implement shared-budget discovery and automatic join
 
 **Issue type:** Subtask  
 **Project:** SCRUM  
 **Parent:** US-014  
-**Summary:** Implement shared-budget discovery and Accept/Decline  
+**Summary:** Implement shared-budget discovery and automatic join  
 **Labels:** expense-tracker, v0-2, sub-101  
 **Delivery gate:** Inherited from parent gate  
 **Source requirements:** MEM 01  
 **Source acceptance:** AC 24; AC 48  
 **Blocked by:** None  
 
-**Description:** List marked Sheets owned by someone else and shared with the signed-in account; show them as pending invitations; Accept writes the `joined` row, Decline is remembered locally; no financial data before the join is processed.
+**Description:** List marked Sheets owned by someone else and shared with the signed-in account; join automatically by writing the `joined` row, then show a one-time notice with a Leave action; no financial data before the join is processed.
 
 **Acceptance criteria:**
 
-- [ ] **AC 24:** Creator is owner; owner shares the Sheet with the invitee's Google email; the invitee's app discovers it automatically and shows a pending invitation; sharing starts only when the invitee taps Accept. No financial data is written before the join is processed.
+- [ ] **AC 24:** Creator is owner; owner shares the Sheet with the invitee's Google email; the invitee's app discovers it automatically and joins, then shows a one-time notice with a Leave action; sharing starts at the recorded join time. No financial data is written before the join is processed.
 - [ ] **AC 48:** Discovery lists only marked Sheets owned by someone else and shared with the signed-in account; unmarked Sheets are ignored; a join from a non-invited account or a second member is rejected; a two-account test proves the scopes and permissions; a partial failure can retry safely.
 - [ ] A Sheet is listed only when its name prefix and `_meta` tab both match and the signed-in account does not own it.
-- [ ] The pending list shows the owner's email; accepting is blocked while another relationship is active.
-- [ ] Accept writes exactly one `joined` row with the account ID and time; tapping again writes no second row.
-- [ ] A declined Sheet is remembered locally and not shown as pending.
+- [ ] The join notice shows the owner's email; joining is blocked while another relationship is active.
+- [ ] Joining writes exactly one `joined` row with the account ID and time; repeated discovery writes no second row.
+- [ ] After the user leaves, that Sheet is remembered locally and is not joined again.
 
 
 **Evidence:** Record focused validation for the listed outcomes, negative paths and relevant data/permission boundaries. Link dependent integration evidence when the criterion spans multiple issues.
@@ -1164,9 +1164,9 @@ The backlog is derived from the requirements and may clarify ownership or gate c
 
 **Acceptance criteria:**
 
-- [ ] **AC 24:** Creator is owner; owner shares the Sheet with the invitee's Google email; the invitee's app discovers it automatically and shows a pending invitation; sharing starts only when the invitee taps Accept. No financial data is written before the join is processed.
+- [ ] **AC 24:** Creator is owner; owner shares the Sheet with the invitee's Google email; the invitee's app discovers it automatically and joins, then shows a one-time notice with a Leave action; sharing starts at the recorded join time. No financial data is written before the join is processed.
 - [ ] **AC 48:** Discovery lists only marked Sheets owned by someone else and shared with the signed-in account; unmarked Sheets are ignored; a join from a non-invited account or a second member is rejected; a two-account test proves the scopes and permissions; a partial failure can retry safely.
-- [ ] **AC 69:** A third account with access, an invitee trying to share their personal budget while a member, reciprocal invitations and a second `joined` row are rejected at Accept and when the owner's app processes the join.
+- [ ] **AC 69:** A third account with access, an invitee trying to share their personal budget while a member, reciprocal invitations and a second `joined` row are rejected at join and when the owner's app processes the join.
 - [ ] The join is accepted only if the `joined` row names the invited account and no other member is active; otherwise shared writes stop and a recovery issue is shown.
 - [ ] Opening amounts are computed from the current month before the join time and written once; a retry after failure does not duplicate them.
 - [ ] A partial failure leaves the state "Joined; waiting for the owner's app to sync" and can be retried.
@@ -1191,7 +1191,7 @@ The backlog is derived from the requirements and may clarify ownership or gate c
 
 **Acceptance criteria:**
 
-- [ ] **AC 04:** A pending invitation (Sheet shared, not accepted) changes neither budget; the invitee's Accept starts sharing from the recorded join time and converts the owner's budget once the owner's app processes it; completed removal returns it to personal without reducing retained spend. Pending removal is visibly incomplete.
+- [ ] **AC 04:** A shared Sheet with no `joined` row yet changes neither budget; the invitee's app joining automatically starts sharing from the recorded join time and converts the owner's budget once the owner's app processes it; completed removal returns it to personal without reducing retained spend. Pending removal is visibly incomplete.
 - [ ] **AC 30:** Rejoin uses new epoch and Sheet; gap expenses/details are not imported; owner retains old snapshot; safe current-month prior-spend aggregates preserve totals.
 - [ ] **AC 43:** Owner removal completes only after confirmed revocation. Invitee leave pauses local sharing immediately but remote revocation remains pending owner processing. Next reconnect clears revoked cache, retaining personal copy.
 - [ ] **AC 44:** After termination own personal correction/refund is allowed; closed shared totals remain frozen. No owner queue or retroactive write; rejected late sync is visible to author.
@@ -1199,7 +1199,7 @@ The backlog is derived from the requirements and may clarify ownership or gate c
 - [ ] Owner removal writes `removing`, pauses shared writes, removes the invitee's Google access, confirms the permission state, stores the final ledger snapshot, then writes `ended`; a failure stays "Removal pending" and never claims revocation.
 - [ ] Invitee leave pauses their shared queue at once, routes new purchases personal-only and writes a `left` row; until the owner's app removes access the UI says "Left; the owner's app must remove access".
 - [ ] Shared-period totals are retained and nothing is subtracted; the owner's budget returns to personal with the same ID.
-- [ ] A rejoin needs a fresh accepted invitation, creates a new epoch and a new Sheet (the old one is archived owner-only) and imports nothing from the gap.
+- [ ] A rejoin needs a fresh share of a new Sheet, creates a new epoch and a new Sheet (the old one is archived owner-only) and imports nothing from the gap.
 - [ ] With the owner's app offline a leave cannot complete, and the UI says so.
 
 
@@ -1224,7 +1224,7 @@ The backlog is derived from the requirements and may clarify ownership or gate c
 - [ ] **AC 43:** Owner removal completes only after confirmed revocation. Invitee leave pauses local sharing immediately but remote revocation remains pending owner processing. Next reconnect clears revoked cache, retaining personal copy.
 - [ ] **AC 49:** Owner offline cannot complete leave; UI states dependency. During closing, app upload pauses; stale queued event after revoked permission is kept personal and visibly rejected for sharing.
 - [ ] Leave time, effective attribution cutoff and completed access-removal time are recorded as three separate values.
-- [ ] States move invited, active, removing, ended (with leave-requested in between where relevant); a failed step never skips ahead.
+- [ ] States move shared-not-joined, active, removing, ended (with leave-requested in between where relevant); a failed step never skips ahead.
 - [ ] A queued event that reaches the Sheet after access was removed is rejected and shown as "Saved personally; not added to closed shared period".
 - [ ] Personal records are untouched by any state change.
 
@@ -1276,11 +1276,11 @@ The backlog is derived from the requirements and may clarify ownership or gate c
 - [ ] **AC 15:** Owner can edit shared limit through app; invitee app/queued mutation is rejected without change. Invitee can edit personal limit. Onboarding explicitly discloses unsupported Google-editor bypass.
 - [ ] **AC 16:** Active user corrects only their own record; all open eligible projections update once and audit entry persists. Other user's app edits are rejected, including budget-owner attempts.
 - [ ] **AC 25:** Both users may view reports and have disclosed Google edit access for sync. Supported changes use app roles; manual cell edits are unsupported and detectable structural damage blocks writes. No read-only-source guarantee is asserted.
-- [ ] **AC 69:** A third account with access, an invitee trying to share their personal budget while a member, reciprocal invitations and a second `joined` row are rejected at Accept and when the owner's app processes the join.
+- [ ] **AC 69:** A third account with access, an invitee trying to share their personal budget while a member, reciprocal invitations and a second `joined` row are rejected at join and when the owner's app processes the join.
 - [ ] **AC 73 [Gate 2]:** Before acceptance, each member is told that active-epoch merchants, amounts, dates, categories/intents and spender attribution are visible to the other member and that no per-transaction exclusion exists in v0.2.
 - [ ] Only the owner can change shared limits and thresholds; an invitee's attempt, including a queued one, is rejected with no change, while the invitee can edit personal limits.
 - [ ] Each user can correct or delete only their own transactions through the app, with no owner override, including via sync import.
-- [ ] Before accepting, each person is told that active-epoch purchase details are visible to the other, that there is no per-purchase hide, and that an authorized Google editor can read or change the Sheet outside the app.
+- [ ] The owner is told when inviting, and the invitee in a notice right after joining with a Leave action, that active-epoch purchase details are visible to the other, that there is no per-purchase hide, and that an authorized Google editor can read or change the Sheet outside the app.
 - [ ] The app never describes Sheet tabs as read-only.
 - [ ] An extra account with access, or a second `joined` row, stops shared writes with a recovery message.
 - [ ] Enforcement claims match what SPIKE-01 demonstrated.
@@ -1652,7 +1652,7 @@ The backlog is derived from the requirements and may clarify ownership or gate c
 - [ ] An evidence pack records, for each Section 9 requirement, the device, OS build, app build, conditions and result with a date.
 - [ ] Every claimed bank, channel and source combination has fixtures per the Gate 3 plan (the targets in D-12, once approved); unsupported combinations are listed as unsupported, never as passed.
 - [ ] Any open defect involving data loss, private-history exposure, incorrect spend or failed revocation blocks sign-off.
-- [ ] The accepted limitation that a permitted Google editor can bypass app rules is recorded.
+- [ ] The accepted limitation that a permitted Google editor can bypass app rules is recorded, as is the accepted limitation that anyone who knows a Google email can start a join by sharing a marked Sheet.
 
 
 **Evidence:** Record focused validation for the listed outcomes, negative paths and relevant data/permission boundaries. Link dependent integration evidence when the criterion spans multiple issues.
