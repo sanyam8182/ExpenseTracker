@@ -15,14 +15,14 @@ One person, usually alone, sometimes sharing a budget with one other person.
 | Owner of a shared budget | One budget, labelled shared. No separate personal budget |
 | Invitee | Personal budget **and** the owner's shared budget, with a switch |
 
-Roles are the same product: anyone can create a budget, invite one person, or accept one invitation.
+Roles are the same product: anyone can create a budget, share it with one person, or be joined to one shared budget.
 
 ## 2. Design principles (from the requirements)
 
 1. **Never hide uncertainty.** Pending review, stale data, pending sync and "incomplete" balances are always visible, in words or icon, never colour alone.
 2. **The balance answers one question:** "how much is left in this category this month?" Everything else supports that.
 3. **Saving is instant and local.** Success feedback appears after the data is saved on the phone. Sync status is shown separately.
-4. **Private by default.** Lock-screen notifications reveal nothing. Sharing disclosures are explicit before Accept.
+4. **Private by default.** Lock-screen notifications reveal nothing. Sharing disclosures are explicit when inviting and again in the notice right after joining; there is no Accept step.
 5. **Review is a first-class place,** not a hidden queue. Items there do not count until confirmed (D-05).
 6. **Honest limits.** The app says what it cannot do (Google editors can edit the Sheet; offline copies may remain).
 
@@ -61,8 +61,8 @@ Navigation rail instead of the bottom bar. Transactions and Review use two panes
 | 12 | Budget: limits | Bottom bar |
 | 13 | Budget: warning thresholds | Budget |
 | 14 | Members: invite | Budget |
-| 15 | Pending invitations (invitee) | Banner on Overview; Budget |
-| 16 | Accept sharing (disclosure + Accept) | Pending invitation |
+| 15 | Shared-budget joined notice (invitee) | Shown once, right after the app joins automatically |
+| 16 | Shared budget details and Leave (invitee) | Budget; the notice |
 | 17 | Members: status, leave, remove | Budget |
 | 18 | Settings and recovery hub | Overflow |
 | 19 | Capture health (3 permissions, last capture, sources) | Settings |
@@ -137,16 +137,15 @@ Navigation rail instead of the bottom bar. Transactions and Review use two panes
 2. Warning thresholds: default 80% and 100%; add/remove one more; values 1–100; owner sets shared, each user sets personal.
 3. Shared budget: invitee sees shared limits read-only with "Only <owner> can change these".
 
-### F8. Sharing: owner invites
-1. Budget → Members → **Invite someone**: email field, plain explanation ("We'll share a Google Sheet with them. Nothing is shared until they accept.").
-2. Confirm → app creates the Sheet and shares it. Status: *Invitation sent, waiting for <email>*. Cancel invitation available.
-3. When the invitee accepts and the owner's app syncs: status *Active since <date>*; the owner's budget becomes *Shared*.
+### F8. Sharing: owner shares the Sheet
+1. Budget → Members → **Invite someone**: email field, plain explanation ("We'll create a Google Sheet and share it with them. Google sends them an email. Their app joins by itself.") plus what they will see and the Google-editor warning, before anything is sent.
+2. Confirm → app creates the Sheet and shares it. Status: *Shared, not joined yet* with **Remove access** (there is no Google invitation state, and no Accept step).
+3. When the invitee's app joins and the owner's app syncs: status *Active since <date>*; the owner's budget becomes *Shared*.
 
-### F9. Sharing: invitee accepts
-1. Overview banner / Budget → "Shared budget from <owner email>" (found automatically).
-2. **Accept screen**: what the other person will see (merchant, amount, date, category, spender), "no way to hide a single purchase", "anyone with edit access to the Sheet can read or change it outside the app", and what stays private (personal budget, past history).
-3. **Accept** / **Decline** (Decline is remembered).
-4. After Accept: *Joined, waiting for <owner>'s app to sync* until the owner's app confirms.
+### F9. Sharing: invitee joins automatically
+1. The invitee's app finds the shared Sheet (when it opens or refreshes) and joins at once. No Accept or Decline.
+2. **Joined notice**, shown once: "You joined <owner>'s shared budget", what the other person will see (merchant, amount, date, category, spender), "no way to hide a single purchase", what stays private (personal budget, purchases from before joining), "anyone with edit access to the Sheet can read or change it outside the app". Buttons: **Got it** and **Leave**.
+3. Then *Joined, waiting for <owner>'s app to sync* until the owner's app confirms. If the person is already in another shared budget, the app does not join and says why.
 
 ### F10. Leaving and removal
 - **Leave (invitee):** confirm → *Left. <Owner>'s app must remove access* until complete. New purchases are personal only.
@@ -157,6 +156,7 @@ Navigation rail instead of the bottom bar. Transactions and Review use two panes
 ### F11. Settings, recovery and data
 - **Capture health:** three permissions, last successful capture, unsupported alert count, allowlisted sources.
 - **Remembered rules:** list, remove.
+- **Show Pocket:** on or off. Off removes the character everywhere.
 - **Export and restore:** last export date, Export now (password), Restore (password + same Google account). Reminder after 7 days of unexported changes.
 - **Deleted items:** restore own deleted records.
 - **Wipe local data:** confirmation ("local data and history will be removed"), offers export first, warns if still in a shared budget.
