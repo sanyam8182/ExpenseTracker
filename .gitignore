@@ -1,0 +1,5 @@
+# Spartan AI config (contains API keys)
+.spartan/ai.env
+
+# Stale copy, markdown is canonical
+Expense_Tracker_Requirements.docx
