@@ -1,13 +1,22 @@
 package com.expensetracker.app.ui.theme
 
 import androidx.compose.material3.Typography
+import androidx.compose.ui.text.ExperimentalTextApi
 import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.text.font.Font
 import androidx.compose.ui.text.font.FontFamily
+import androidx.compose.ui.text.font.FontVariation
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.sp
+import com.expensetracker.app.R
 
-/** DM Sans is bundled in plan task 5; until then the system sans is used so the app builds. */
-val AppFontFamily: FontFamily = FontFamily.SansSerif
+/** DM Sans is a variable font (OFL, licence in app/licenses); each weight is a variation of the one file. */
+@OptIn(ExperimentalTextApi::class)
+val AppFontFamily: FontFamily = FontFamily(
+    listOf(FontWeight.Normal, FontWeight.Medium, FontWeight.SemiBold).map { weight ->
+        Font(R.font.dm_sans, weight, variationSettings = FontVariation.Settings(FontVariation.weight(weight.weight)))
+    },
+)
 
 private const val TABULAR_FIGURES = "tnum"
 
