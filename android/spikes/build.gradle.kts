@@ -36,6 +36,7 @@ dependencies {
     implementation(libs.compose.material3)
     implementation(libs.androidx.activity.compose)
     implementation(libs.androidx.core.ktx)
+    implementation(libs.androidx.lifecycle.runtime.compose)
 
     // SPIKE-05: encrypted storage and portable export
     implementation(libs.androidx.room.runtime)

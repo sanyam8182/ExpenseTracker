@@ -7,10 +7,14 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.statusBarsPadding
+import android.content.Intent
+import androidx.compose.material3.Button
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
+import com.expensetracker.spikes.s04.PermissionLab
 
 data class Spike(val id: String, val jira: String, val question: String)
 
@@ -28,7 +32,12 @@ class SpikeLauncher : ComponentActivity() {
         setContent {
             MaterialTheme {
                 Column(Modifier.fillMaxSize().statusBarsPadding().padding(16.dp)) {
+                    val context = LocalContext.current
                     Text("Gate 0 spikes", style = MaterialTheme.typography.headlineMedium)
+                    Button(
+                        onClick = { context.startActivity(Intent(context, PermissionLab::class.java)) },
+                        modifier = Modifier.padding(top = 12.dp),
+                    ) { Text("Open SPIKE-04 lab") }
                     Spikes.forEach { spike ->
                         Text(
                             "${spike.id} (${spike.jira})",
