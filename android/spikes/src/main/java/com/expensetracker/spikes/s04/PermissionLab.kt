@@ -73,6 +73,7 @@ private fun Lab() {
     val context = LocalContext.current
     var refresh by remember { mutableIntStateOf(0) }
     var message by remember { mutableStateOf("") }
+    var postNote by remember { mutableStateOf("") }
     LifecycleResumeEffect(Unit) {
         refresh++
         onPauseOrDispose { }
@@ -96,10 +97,10 @@ private fun Lab() {
             Button(onClick = { context.startActivity(Intent(Settings.ACTION_NOTIFICATION_LISTENER_SETTINGS)) }) { Text("Open access settings") }
             OutlinedButton(onClick = { openAppInfo(context) }) { Text("App info") }
         }
-        Capability("3. Posting own notifications", if (state >= 0 && Notifier.canPost(context)) "allowed" else "blocked") {
+        Capability("3. Posting own notifications", if (state >= 0 && Notifier.canPost(context)) "allowed" else "blocked", note = postNote) {
             Button(onClick = { askPost.launch(Manifest.permission.POST_NOTIFICATIONS) }) { Text("Ask") }
             OutlinedButton(onClick = {
-                message = if (Notifier.post(context, "Your Spike 04 test alert for Rs.640 at ZXCV SHOP")) {
+                postNote = if (Notifier.post(context, "Your Spike 04 test alert for Rs.640 at ZXCV SHOP")) {
                     "Test notification posted."
                 } else {
                     "Posting is blocked, so this message is shown in the app instead (manual fallback works)."
@@ -149,11 +150,12 @@ private fun Lab() {
 }
 
 @Composable
-private fun Capability(title: String, status: String, actions: @Composable () -> Unit) {
+private fun Capability(title: String, status: String, note: String = "", actions: @Composable () -> Unit) {
     Column(verticalArrangement = Arrangement.spacedBy(4.dp)) {
         Text(title, style = MaterialTheme.typography.titleMedium)
         if (status.isNotEmpty()) Text("Status: $status")
         Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) { actions() }
+        if (note.isNotEmpty()) Text(note, color = MaterialTheme.colorScheme.primary)
     }
 }
 
